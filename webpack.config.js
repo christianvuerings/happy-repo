@@ -20,27 +20,30 @@ const config = {
 		}
   },
   entry: {
-    common_desktop: 'src/main.scss',
+    // 1a. CSS only version
+    common_desktop: 'src/main.css',
   },
   module: {
     loaders: [
+      // 1b. CSS only version
       {
-        test: /\.scss/,
-				/* 1. With ExtractTextPlugin */
-        loader: ExtractTextPlugin.extract('style', 'happypack/loader?id=sass', {
+        test: /\.css$/,
+
+        /**
+         * With only CSS, the following breaks with happypack:
+         *
+         * Module parse failed: /Users/christian/code/happy-repo/src/common-css/include.css * Unexpected token (1:5)
+         * You may need an appropriate loader to handle this file type.
+         * SyntaxError: Unexpected token (1:5)
+         */
+        loader: ExtractTextPlugin.extract('style', 'happypack/loader?id=css', {
           allChunks: true
-        }),
+        })
 
-				/* 2. Also an issue without ExtractTextPlugin */
-				// loader: 'happypack/loader?id=sass',
-
-				/* FIXED - This fixes it, not using HappyPack */
-        // loader: ExtractTextPlugin.extract('style-loader', 'css!sass', {
+        // 2. CSS only with no webpack => works correctly
+        // loader: ExtractTextPlugin.extract('style', 'css', {
         //   allChunks: true
-        // }),
-        include: [
-          /src\//
-        ]
+        // })
       }
     ]
   },
@@ -52,10 +55,8 @@ const config = {
   plugins: [
     new ExtractTextPlugin('[name].css'),
 
-    // createHappyPlugin('sass', ['css!sass']),
-
-		/* 3. Specifying the importLoaders query doesn't help */
-    createHappyPlugin('sass', ['css?importLoaders=1!sass']),
+    /* 1c. CSS only (no SASS) version */
+    createHappyPlugin('css', ['css'])
   ],
 };
 
